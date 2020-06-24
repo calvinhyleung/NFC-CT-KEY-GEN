@@ -1,0 +1,15 @@
+{
+    "name": "NFC Contact Tracing",
+    "version": "1.0.0",
+    "description": "Using NFC to trace contacts among users",
+    "author": "Calvin Leung <calvinhyleung@gmail.com>",
+    "main": "app.js",
+    "scripts": {
+        "start": "node app.js"
+    },
+    "dependencies": {
+        "express": "^4.17.1",
+        "google-auth-library": "^6.0.2",
+        "morgan": "^1.10.0"
+    }
+}
