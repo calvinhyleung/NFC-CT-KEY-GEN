@@ -1,10 +1,6 @@
 <html lang="en">
   <head>
-    <meta name="google-signin-scope" content="profile email" />
-    <meta
-      name="google-signin-client_id"
-      content="149540714264-qr31ptlecdrqh2sloksud4n6de013jnu.apps.googleusercontent.com"
-    />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta
       http-equiv="origin-trial"
       content="Ahent2KLVxl7SV7xpZQVqU4t+8epm5MzqIWhPnosrkYhTI0EsOCDKp8jXpEnQ62+pfF+G7Clgx/YdH8BZj+upAEAAABReyJvcmlnaW4iOiJodHRwczovL2NhbHZpbmh5bGV1bmcuY29tOjQ0MyIsImZlYXR1cmUiOiJXZWJORkMiLCJleHBpcnkiOjE1OTU5ODA3OTl9"
@@ -12,47 +8,8 @@
     <script src="https://apis.google.com/js/platform.js" async defer></script>
   </head>
   <body>
-    <h1>NFC Contact Tracing</h1>
-    <div class="g-signin2" data-onsuccess="onSignIn" data-theme="dark"></div>
-    <script>
-      function onSignIn(googleUser) {
-        // Useful data for your client-side scripts:
-        var profile = googleUser.getBasicProfile();
-        console.log("ID: " + profile.getId()); // Don't send this directly to your server!
-        console.log("Full Name: " + profile.getName());
-        console.log("Given Name: " + profile.getGivenName());
-        console.log("Family Name: " + profile.getFamilyName());
-        console.log("Image URL: " + profile.getImageUrl());
-        console.log("Email: " + profile.getEmail());
 
-        // The ID token you need to pass to your backend:
-        var id_token = googleUser.getAuthResponse().id_token;
-        console.log("ID Token: " + id_token);
-
-        var xhr = new XMLHttpRequest();
-        xhr.open("POST", "http://192.168.1.221.xip.io:3000/handle");
-        xhr.setRequestHeader(
-          "Content-Type",
-          "application/x-www-form-urlencoded"
-        );
-        xhr.onload = function () {
-          console.log("Signed in as: " + xhr.responseText);
-        };
-        xhr.send("idtoken=" + id_token);
-      }
-    </script>
-    <a href="#" onclick="signOut();">Sign out</a>
-    <script>
-      function signOut() {
-        var auth2 = gapi.auth2.getAuthInstance();
-        auth2.signOut().then(function () {
-          console.log("User signed out.");
-        });
-      }
-    </script>
-
-    <button id="scanButton">Scan</button>
-
+    <h1>NFC Key Generator</h1>
     <script>
       var ChromeSamples = {
         log: function () {
@@ -103,6 +60,64 @@
     </script>
 
     <script>
+      /*
+      function copyToClipboard(val){
+        var dummy = document.createElement("input");
+        dummy.style.display = 'none';
+        document.body.appendChild(dummy);
+
+        dummy.setAttribute("id", "dummy_id");
+        document.getElementById("dummy_id").value=val;
+        dummy.select();
+        document.execCommand("copy");
+        document.body.removeChild(dummy);
+        console.log("ran")
+      }
+      */
+      window.addEventListener("load", async () => {
+        //log("User clicked scan button");
+
+        try {
+          const reader = new NDEFReader();
+          await reader.scan();
+          //log("> Scan started");
+
+          reader.addEventListener("error", (event) => {
+            let word = String(event.message) + "5678";
+            log(word);
+            let serial = String("5d6a43");
+            let lastfour = serial[serial.length-4] + serial[serial.length-3] + serial[serial.length-2] + serial[serial.length-1] //last4 
+            let code = parseInt(lastfour,16);
+            log(code);
+            //log(`Argh! ${event.message} 5678`);
+            
+          });
+
+          reader.addEventListener("reading", ({ message, serialNumber }) => {
+
+            /*************************  ENCRYPTION *************************/
+            //let serial = String(serialNumber);
+            //let lastfour = serial[serial.lenth-4] + serial[serial.lenth-3] + serial[serial.lenth-2] + serial[serial.lenth-1] //last4 
+            //let code = parseInt(last4,16);
+            //log(code);
+            /*************************  ENCRYPTION *************************/
+            let hex = serialNumber[6] + serialNumber[7] + serialNumber[18] + serialNumber[19]
+            //log(hex)
+            let code = parseInt(hex, 16);
+            
+            log(`> Serial Number: ${serialNumber}`);
+            log("\n\n")
+            log("Enter code: " + code)
+            //log(`> Records: (${message.records.length})`);
+            
+          });
+        } catch (error) {
+          log("Argh! " + error +"1234");
+          
+        }
+      });
+      
+      /*
       scanButton.addEventListener("click", async () => {
         log("User clicked scan button");
 
@@ -119,18 +134,6 @@
             log(`> Serial Number: ${serialNumber}`);
             log(`> Records: (${message.records.length})`);
           });
-        } catch (error) {
-          log("Argh! " + error);
-        }
-      });
-      /*
-      writeButton.addEventListener("click", async () => {
-        log("User clicked write button");
-
-        try {
-          const writer = new NDEFWriter();
-          await writer.write("Hello world!");
-          log("> Message written");
         } catch (error) {
           log("Argh! " + error);
         }

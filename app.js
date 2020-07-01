@@ -16,7 +16,7 @@ app.use(bodyParser.json()); // support json encoded bodies
 app.use(bodyParser.urlencoded({ extended: true })); // support encoded bodies
 
 // open port 3000 for a server 
-const PORT = process.env.PORT || 3000;
+const PORT = 3000;
 app.listen(PORT, () => console.log('Server Running on Port '+ PORT));
 
 const clientID = '149540714264-qr31ptlecdrqh2sloksud4n6de013jnu.apps.googleusercontent.com'; 
@@ -64,5 +64,4 @@ app.post('/handle', function(request, response){
     }
     verify().catch(console.error);
 })
-
 
